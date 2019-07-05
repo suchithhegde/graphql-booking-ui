@@ -1,10 +1,12 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 
+import './MainNavigation.css';
+
 const mainNavigation = props => (
-    <header>
+    <header className="main-navigation">
          <div className="main-navigation__logo">
-            <h1>BANA_Event_Manager</h1>
+            <h1>TrialEvents</h1>
          </div>
          <nav className="main-navigation__item">
           <ul>
@@ -13,7 +15,7 @@ const mainNavigation = props => (
               <li><NavLink to="/bookings">Bookings</NavLink></li>
           </ul>
          </nav>
-      </header>
+    </header>
 );
 
 export default mainNavigation;
