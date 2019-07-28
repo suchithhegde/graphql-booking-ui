@@ -18,7 +18,7 @@ class AuthPage extends Component {
 
   switchModeHandler = () => {
     this.setState(prevState => {
-      return {isLogin: !prevState.isLogin};
+      return { isLogin: !prevState.isLogin };
     })
   }
 
@@ -26,7 +26,7 @@ class AuthPage extends Component {
       event.preventDefault();
       const email = this.emailEl.current.value;
       const password = this.passwordEl.current.value;
-      if(email.trim().length ===0 || password.trim().length ===0 ){
+      if(email.trim().length === 0 || password.trim().length === 0 ){
         return;
       }
 
@@ -54,6 +54,7 @@ class AuthPage extends Component {
             `
           };
     }
+    
       //...send the values to backend APIs
       fetch('http://localhost:8000/graphql', {
         method: 'POST',
@@ -64,7 +65,7 @@ class AuthPage extends Component {
       })
       .then(res => {
         if (res.status !== 200 && res.status !== 201) {
-          throw new Error('Failed!!')
+          throw new Error('Auth Failed!!')
         }
         return res.json();
       })
