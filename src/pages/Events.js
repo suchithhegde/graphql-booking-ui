@@ -7,7 +7,8 @@ import './Events.css';
 
 class EventsPage extends Component {
   state = {
-    creating: false
+    creating: false,
+    events: []
   };
  // get Auth token and send it with events API
   static contextType = AuthContext;
@@ -18,6 +19,10 @@ class EventsPage extends Component {
       this.priceElRef = React.createRef();
       this.dateElRef = React.createRef();
       this.descriptionElRef = React.createRef();
+  }
+
+  componentDidMount() {
+      this.fetchEvents();
   }
 
   startCreateEventhandler = () => {
@@ -69,12 +74,12 @@ const token = this.context.token;
     })
     .then(res => {
       if (res.status !== 200 && res.status !== 201) {
-        throw new Error('Response Status Failed!!')
+        throw new Error('Response Status Failed on mutation events!!')
       }
       return res.json();
     })
     .then(resData => {
-      console.log(resData);
+      this.fetchEvents();
     })
     .catch(err => {
       console.log(err);
@@ -85,7 +90,56 @@ const token = this.context.token;
     this.setState({creating: false});
   };
 
+  fetchEvents() {
+      //start send to Events API
+       const requestBody = {
+            query: `
+              query {
+                events {
+                  _id
+                  title
+                  description
+                  date
+                  price
+                }
+              }
+            `
+          };
+
+  //send the values to backend APIs //
+      fetch('http://localhost:8000/graphql', {
+        method: 'POST',
+        body: JSON.stringify(requestBody),
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+      .then(res => {
+        if (res.status !== 200 && res.status !== 201) {
+          throw new Error('Response Status Failed on Query events!!')
+        }
+        return res.json();
+      })
+      .then(resData => {
+        console.log(resData);
+        const events = resData.data.events;
+        this.setState({events: events});
+      })
+      .catch(err => {
+        console.log(err);
+      });
+      //end send to Events API
+  }
+
   render() {
+    const eventList = this.state.events.map(event => {
+        return (
+            <li key={event._id} className="events__list-item">
+                {event.title}
+            </li>
+        );
+    });
+
     return (
       <React.Fragment>
        {this.state.creating && <Backdrop />}
@@ -123,8 +177,7 @@ const token = this.context.token;
         </div>
         )}
         <ul className="events__list">
-            <li className="events__list-item">Test 1</li>
-            <li className="events__list-item">Test 2</li>
+            {eventList}
         </ul>
       </React.Fragment>
     );
