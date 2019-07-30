@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import Modal from '../components/Modal/Modal';
 import Backdrop from '../components/Backdrop/Backdrop';
+import EventList from '../components/Events/EventList/EventList';
 import AuthContext from '../context/auth-context';
 import './Events.css';
 
@@ -101,6 +102,10 @@ const token = this.context.token;
                   description
                   date
                   price
+                  creator {
+                      _id
+                      email
+                  }
                 }
               }
             `
@@ -132,14 +137,6 @@ const token = this.context.token;
   }
 
   render() {
-    const eventList = this.state.events.map(event => {
-        return (
-            <li key={event._id} className="events__list-item">
-                {event.title}
-            </li>
-        );
-    });
-
     return (
       <React.Fragment>
        {this.state.creating && <Backdrop />}
@@ -176,9 +173,10 @@ const token = this.context.token;
           <button className="btn" onClick={this.startCreateEventhandler}>Create Event</button>
         </div>
         )}
-        <ul className="events__list">
-            {eventList}
-        </ul>
+        <EventList
+            events={this.state.events}
+            authUserId={this.context.userId}
+            />
       </React.Fragment>
     );
   }
