@@ -16,7 +16,7 @@ class EventsPage extends Component {
   };
  // get Auth token and send it with events API
   static contextType = AuthContext;
-
+  isActive = true;
   constructor(props) {
       super(props);
       this.titleElRef = React.createRef();
@@ -140,12 +140,15 @@ const token = this.context.token;
       })
       .then(resData => {
         const events = resData.data.events;
-        this.setState({events: events});
-        this.setState({ events: events, isLoading: false });
+        if (this.isActive) {
+            this.setState({ events: events, isLoading: false });
+        }
       })
       .catch(err => {
         console.log(err);
-        this.setState({ isLoading: false });
+        if (this.isActive) {
+            this.setState({ isLoading: false });
+        }
       });
       //end send to Events API
   }
@@ -157,8 +160,51 @@ const token = this.context.token;
       })
   }
 
-  bookEventHandler = () => {}
+  bookEventHandler = () => {
+      //Start of bookevent API
+      if (!this.context.token) {
+          this.setState({selectedEvent: null});
+          return;
+      }
+      const requestBody = {
+           query: `
+             mutation {
+               bookEvent(eventId: "${this.state.selectedEvent._id}") {
+                 _id
+                 createdAt
+                 updatedAt
+               }
+             }
+           `
+         };
 
+ //send the values to backend APIs //
+     fetch('http://localhost:8000/graphql', {
+       method: 'POST',
+       body: JSON.stringify(requestBody),
+       headers: {
+         'Content-Type': 'application/json',
+         'Authorization': 'Bearer ' + this.context.token
+       }
+     })
+     .then(res => {
+       if (res.status !== 200 && res.status !== 201) {
+         throw new Error('Response Status Failed on Booking events!!')
+       }
+       return res.json();
+     })
+     .then(resData => {
+       console.log(resData);
+       this.setState({selectedEvent: null});
+     })
+     .catch(err => {
+       console.log(err);
+     });
+      //End of bookevent API
+  }
+  componentWillUnmount(){
+      this.isActive = false;
+  }
   render() {
     return (
       <React.Fragment>
@@ -199,8 +245,8 @@ const token = this.context.token;
                  canCancel
                  canConfirm
                  onCancel = {this.modalCancelHandler}
-                 onConfirm = {this.bookEventHandler} 
-                 confirmText="Book"
+                 onConfirm = {this.bookEventHandler}
+                 confirmText={this.context.token ? 'Book' : 'Confirm'}
                  >
             <h1>{this.state.selectedEvent.title}</h1>
             <h2>${this.state.selectedEvent.price} - {new Date(this.state.selectedEvent.date).toLocaleDateString()}</h2>
