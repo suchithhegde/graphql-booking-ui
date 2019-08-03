@@ -32,29 +32,37 @@ class AuthPage extends Component {
 
       let requestquery = {
         query: `
-        query {
-          login(email: "${email}", password: "${password}"){
+        query Login($emailId: String!, $password: String!){
+          login(email: $emailId, password: $password){
             userId
             tokenExpiration
             token
           }
         }
-        `
+        `,
+        variables: {
+            emailId: email,
+            password: password
+        }
       };
 
       if (!this.state.isLogin) {
           requestquery = {
             query: `
-              mutation {
-                createUser(userInput: {email: "${email}", password: "${password}"}) {
+              mutation CreateUser($emailId: String!, $password: String!){
+                createUser(userInput: {email: $emailId, password: $password}) {
                   _id
                   email
                 }
               }
-            `
+            `,
+            variables: {
+                emailId: email,
+                password: password
+            }
           };
     }
-    
+
       //...send the values to backend APIs
       fetch('http://localhost:8000/graphql', {
         method: 'POST',

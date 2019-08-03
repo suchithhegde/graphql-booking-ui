@@ -51,8 +51,8 @@ class EventsPage extends Component {
     //start send to Events API
      const requestBody = {
           query: `
-            mutation {
-              createEvent(eventInput: {title: "${title}", description: "${description}", date: "${date}", price: ${price}}) {
+            mutation CreateEvent($title: String!, $desc: String!, $price: Float!, $date: String!){
+              createEvent(eventInput: {title: $title, description: $desc, date: $date, price: $price}) {
                 _id
                 title
                 description
@@ -60,7 +60,13 @@ class EventsPage extends Component {
                 price
               }
             }
-          `
+          `,
+          variables: {
+              title: title,
+              desc: description,
+              price: price,
+              date: date
+          }
         };
 const token = this.context.token;
 //send the values to backend APIs //
@@ -168,14 +174,17 @@ const token = this.context.token;
       }
       const requestBody = {
            query: `
-             mutation {
-               bookEvent(eventId: "${this.state.selectedEvent._id}") {
+             mutation BookEvent($id: ID!){
+               bookEvent(eventId: $id) {
                  _id
                  createdAt
                  updatedAt
                }
              }
-           `
+           `,
+           variables: {
+               id: this.state.selectedEvent._id
+           }
          };
 
  //send the values to backend APIs //
